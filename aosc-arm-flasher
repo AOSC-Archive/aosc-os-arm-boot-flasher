@@ -50,3 +50,12 @@ if ((\!$found)); then
 	echo "Invalid solution." >&2
 	exit 1
 fi
+
+_sol_flash_cap_varname="${used_sol}_flash_cap"
+
+if  ! [ "${!_sol_flash_cap_varname}" ]; then
+	echo "No flashing capabilities are defied for the solution." >&2
+	exit 1
+fi
+
+echo "Available flashing capabilities: ${!_sol_flash_cap_varname}"
