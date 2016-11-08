@@ -1,0 +1,36 @@
+#! /bin/bash
+
+if [ ! -e /etc/aosc-arm.conf ]; then
+	echo "AOSC OS ARM version configuration file not found." >&2
+	exit 1
+fi
+
+source /etc/aosc-arm.conf
+
+if [ ! "$DEVICE" ]; then
+	echo "No device specified." >&2
+	exit 1
+fi
+
+available_sols=""
+
+if [ ! -d /usr/lib/aosc-os-arm-boot-flasher/solutions ]; then
+	echo "Cannot find any solutions installed." >&2
+	exit 1
+fi
+
+for i in /usr/lib/aosc-os-arm-boot-flasher/solutions/*
+do
+	source "$i"
+	current_sol=$(basename "$i")
+	if "${current_sol}_is_available"; then
+		available_sols+=" ${current_sol}"
+	fi
+done
+
+if [ "${available_sols}" = "" ]; then
+	echo "No available solution found." >&2
+	exit 1
+fi
+
+echo "Available solutions: ${available_sols}"
