@@ -32,6 +32,8 @@ sun8i-a23-q8-tablet
 sun8i-a33-q8-tablet
 "
 
+sunxi_flash_cap="bootloader kernel"
+
 sunxi_is_available(){
 	for i in $_sunxi_devices_list
 	do
