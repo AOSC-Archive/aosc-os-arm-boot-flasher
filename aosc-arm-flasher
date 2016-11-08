@@ -59,3 +59,21 @@ if  ! [ "${!_sol_flash_cap_varname}" ]; then
 fi
 
 echo "Available flashing capabilities: ${!_sol_flash_cap_varname}"
+echo "Please choose capbilities which is intended to be executed: "
+read used_cap
+
+for i in $used_cap
+do
+	found=0
+	for j in ${!_sol_flash_cap_varname}
+	do
+		if [ "$j" = "$i" ]; then
+			found=1
+			break
+		fi
+	done
+	if ((\!$found)); then
+		echo "Capbility $i not found!" >&2
+		exit 1
+	fi
+done
