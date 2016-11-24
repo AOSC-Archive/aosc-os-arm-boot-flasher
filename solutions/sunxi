@@ -43,3 +43,54 @@ sunxi_is_available(){
 	done
 	return 1
 }
+
+sunxi_do_flash_bootloader() {
+	if [ -e "${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/u-boot-$DEVICE" ]; then
+		if [ ! "$SUNXI_FIRMWARE_DEVICE" ]; then
+			SUNXI_FIRMWARE_DEVICE=/dev/mmcblk0 # fallback
+		fi
+		if [ "$(echo "$(basename $SUNXI_FIRMWARE_DEVICE)" | cut -c 1-6)" = "spidev" ]; then
+			echo "SPI Flashing is not still supported. Sorry." >&2
+			return 1
+		elif [ "$(echo "$(basename $SUNXI_FIRMWARE_DEVICE)" | cut -c 1-6)" = "mmcblk" ]; then
+			dd if="${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/u-boot-$DEVICE/u-boot-sunxi-with-spl.bin" of="$SUNXI_FIRMWARE_DEVICE" bs=1024 seek=8
+		else
+			echo "Unsupported firmware device: $SUNXI_FIRMWARE_DEVICE" >&2
+		fi
+	else
+		echo "Cannot find suitable U-Boot." >&2
+	fi
+}
+
+sunxi_do_flash_kernel() {
+	mount_point=$(mktemp -d)
+	if [ ! "$SUNXI_KERNEL_DEVICE" ]; then
+		SUNXI_KERNEL_DEVICE=/dev/mmcblk0p1
+	fi
+	if [ -d "$SUNXI_KERNEL_DEVICE" ]; then
+		# should be a /boot
+		mount -o bind "$SUNXI_KERNEL_DEVICE" $mount_point
+	else
+		mount "$SUNXI_KERNEL_DEVICE" $mount_point
+	fi
+	if [ $? -gt 0 ]; then
+		echo "Mount kernel device failed." >&2
+		exit 1
+	fi
+	if [ "$(echo $DEVICE | cut -c 1-5)" = "sun4i" ] || [ "$(echo $DEVICE | cut -c 1-5)" = "sun5i" ]; then
+		# Non-KVM device
+		kernel_variant=nokvm
+	else
+		kernel_variant=kvm
+	fi
+	cp ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/linux-sunxi-$kernel_variant/zImage $mount_point/
+	mkdir -p ${TEST_ROOT}/usr/lib/modules
+	cp -r ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/linux-sunxi-$kernel_variant/modules/* ${TEST_ROOT}/usr/lib/modules/
+	if [ -e ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/dtb-$DEVICE ]; then
+		cp ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/dtb-$DEVICE/dtb.dtb $mount_point/
+	else
+		echo "Suitablt Device Tree binary not found, not updating it." >&2
+	fi
+	umount $mount_point
+	rm -r $mount_point
+}
