@@ -68,9 +68,13 @@ if  ! [ "${!_sol_flash_cap_varname}" ]; then
 	exit 1
 fi
 
-echo "Available flashing capabilities: ${!_sol_flash_cap_varname}"
-echo "Please choose capbilities which is intended to be executed: "
-read used_cap
+if [ ! "$FLASHER_CAPABILITIES" ]; then
+	echo "Available flashing capabilities: ${!_sol_flash_cap_varname}"
+	echo "Please choose capbilities which is intended to be executed: "
+	read used_cap
+else
+	used_cap="$FLASHER_CAPABILITIES"
+fi
 
 for i in $used_cap
 do
