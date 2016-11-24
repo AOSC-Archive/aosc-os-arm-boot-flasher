@@ -77,3 +77,11 @@ do
 		exit 1
 	fi
 done
+
+for i in $used_cap
+do
+	if ! "${used_sol}_do_flash_${i}"; then
+		echo "Error when flashing $i" >&2
+		exit 1
+	fi
+done
