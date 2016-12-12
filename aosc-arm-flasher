@@ -7,7 +7,7 @@ fi
 
 source ${TEST_ROOT}/etc/aosc-arm.conf
 
-if [ ! "$DEVICE" ]; then
+if [ ! "$DEVICE_NAME" ]; then
 	echo "No device specified." >&2
 	exit 1
 fi

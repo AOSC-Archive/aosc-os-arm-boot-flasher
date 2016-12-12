@@ -44,7 +44,7 @@ sunxi_flash_cap="bootloader kernel"
 sunxi_is_available(){
 	for i in $_sunxi_devices_list
 	do
-		if [ "$DEVICE" = "$i" ]; then
+		if [ "$DEVICE_NAME" = "$i" ]; then
 			return 0
 		fi
 	done
@@ -52,7 +52,7 @@ sunxi_is_available(){
 }
 
 sunxi_do_flash_bootloader() {
-	if [ -e "${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/u-boot-$DEVICE" ]; then
+	if [ -e "${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/u-boot-$DEVICE_NAME" ]; then
 		if [ ! "$SUNXI_FIRMWARE_DEVICE" ]; then
 			SUNXI_FIRMWARE_DEVICE=/dev/mmcblk0 # fallback
 		fi
@@ -60,7 +60,7 @@ sunxi_do_flash_bootloader() {
 			echo "SPI Flashing is not still supported. Sorry." >&2
 			return 1
 		elif [ "$(echo "$(basename $SUNXI_FIRMWARE_DEVICE)" | cut -c 1-6)" = "mmcblk" ]; then
-			dd if="${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/u-boot-$DEVICE/u-boot-sunxi-with-spl.bin" of="$SUNXI_FIRMWARE_DEVICE" bs=1024 seek=8
+			dd if="${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/u-boot-$DEVICE_NAME/u-boot-sunxi-with-spl.bin" of="$SUNXI_FIRMWARE_DEVICE" bs=1024 seek=8
 		else
 			echo "Unsupported firmware device: $SUNXI_FIRMWARE_DEVICE" >&2
 		fi
@@ -84,7 +84,7 @@ sunxi_do_flash_kernel() {
 		echo "Mount kernel device failed." >&2
 		exit 1
 	fi
-	if [ "$(echo $DEVICE | cut -c 1-5)" = "sun4i" ] || [ "$(echo $DEVICE | cut -c 1-5)" = "sun5i" ]; then
+	if [ "$(echo $DEVICE_NAME | cut -c 1-5)" = "sun4i" ] || [ "$(echo $DEVICE_NAME | cut -c 1-5)" = "sun5i" ]; then
 		# Non-KVM device
 		kernel_variant=nokvm
 	else
@@ -93,8 +93,8 @@ sunxi_do_flash_kernel() {
 	cp ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/linux-sunxi-$kernel_variant/zImage $mount_point/
 	mkdir -p ${TEST_ROOT}/usr/lib/modules
 	cp -r ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/linux-sunxi-$kernel_variant/modules/* ${TEST_ROOT}/usr/lib/modules/
-	if [ -e ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/dtb-$DEVICE ]; then
-		cp ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/dtb-$DEVICE/dtb.dtb $mount_point/
+	if [ -e ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/dtb-$DEVICE_NAME ]; then
+		cp ${TEST_ROOT}/usr/lib/aosc-os-armel-sunxi-boot/dtb-$DEVICE_NAME/dtb.dtb $mount_point/
 	else
 		echo "Suitablt Device Tree binary not found, not updating it." >&2
 	fi
