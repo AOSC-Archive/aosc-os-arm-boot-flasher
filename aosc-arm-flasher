@@ -7,6 +7,11 @@ fi
 
 source ${TEST_ROOT}/etc/aosc-arm.conf
 
+if [ "$1" = "autoflash" ] && [ "$2" = "$AUTOFLASH_KEY" ]; then
+	export FLASHER_CAPABILITIES="$AUTOFLASH_CAPABILITIES"
+	exec "$0"
+fi
+
 if [ ! "$DEVICE_NAME" ]; then
 	echo "No device specified." >&2
 	exit 1
