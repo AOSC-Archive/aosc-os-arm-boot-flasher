@@ -7,9 +7,13 @@ fi
 
 source ${TEST_ROOT}/etc/aosc-arm.conf
 
-if [ "$1" = "autoflash" ] && [ "$2" = "$AUTOFLASH_KEY" ]; then
-	export FLASHER_CAPABILITIES="$AUTOFLASH_CAPABILITIES"
-	exec "$0"
+if [ "$1" = "autoflash" ]; then
+	if [ "$2" = "$AUTOFLASH_KEY" ]; then
+		export FLASHER_CAPABILITIES="$AUTOFLASH_CAPABILITIES"
+		exec "$0"
+	else
+		exit 0
+	fi
 fi
 
 if [ ! "$DEVICE_NAME" ]; then
