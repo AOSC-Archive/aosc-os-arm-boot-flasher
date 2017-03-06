@@ -3,9 +3,9 @@ sun50i-a64-pine64-plus
 sun50i-h5-orangepi-pc2
 "
 
-sunxi_flash_cap="bootloader kernel"
+sunxi64_flash_cap="bootloader kernel"
 
-sunxi_is_available(){
+sunxi64_is_available(){
 	for i in $_sunxi_devices_list
 	do
 		if [ "$DEVICE_NAME" = "$i" ]; then
@@ -15,7 +15,7 @@ sunxi_is_available(){
 	return 1
 }
 
-sunxi_do_flash_bootloader() {
+sunxi64_do_flash_bootloader() {
 	if [ -e "${TEST_ROOT}/usr/lib/aosc-os-arm64-sunxi-boot/u-boot-$DEVICE_NAME" ]; then
 		if [ ! "$SUNXI_FIRMWARE_DEVICE" ]; then
 			SUNXI_FIRMWARE_DEVICE=/dev/mmcblk0 # fallback
@@ -33,7 +33,7 @@ sunxi_do_flash_bootloader() {
 	fi
 }
 
-sunxi_do_flash_kernel() {
+sunxi64_do_flash_kernel() {
 	mount_point=$(mktemp -d)
 	if [ ! "$SUNXI_KERNEL_DEVICE" ]; then
 		SUNXI_KERNEL_DEVICE=/dev/mmcblk0p1
@@ -48,7 +48,7 @@ sunxi_do_flash_kernel() {
 		echo "Mount kernel device failed." >&2
 		exit 1
 	fi
-	cp ${TEST_ROOT}/usr/lib/aosc-os-arm64-sunxi-boot/linux-kernel-sunxi64/zImage $mount_point/
+	cp ${TEST_ROOT}/usr/lib/aosc-os-arm64-sunxi-boot/linux-kernel-sunxi64/Image $mount_point/
 	mkdir -p ${TEST_ROOT}/usr/lib/modules
 	cp -r ${TEST_ROOT}/usr/lib/aosc-os-arm64-sunxi-boot/linux-kernel-sunxi64/modules/* ${TEST_ROOT}/usr/lib/modules/
 	if [ -e ${TEST_ROOT}/usr/lib/aosc-os-arm64-sunxi-boot/dtb-$DEVICE_NAME ]; then
